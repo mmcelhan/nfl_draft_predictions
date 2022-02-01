@@ -1,0 +1,31 @@
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
+madden = 1
+
+import player_master
+import geo_master
+import college_master
+import college_stats_build
+import combine_stats_build
+import college_players_build
+import college_economics_build
+import draft_stats_build
+import weather_build
+import city_economics_build
+
+
+if madden:
+    from madden_build import main as madden_main
+    madden_main()
+    #from madden_build import add_espn_id
+    from madden_build import add_fms_id
+
+    #add_espn_id()
+    add_fms_id()
+
+
+
+
+

@@ -1,0 +1,19 @@
+{
+  "source": "data_staging",
+  "target": "data_warehouse",
+  "output_folder": "players_wh",
+  "output_file": "college_players.csv",
+  "folder":"players_stage",
+  "file": "raw_players_college.csv",
+  "column_rename":
+  {
+    "school": "college",
+    "id": "espn_id"
+  },
+  "column_order":
+
+            ["espn_id", "full_name", "first_name", "last_name", "position", "position_group", "section", "college",
+              "home_city", "home_state", "home_country"
+]
+
+}

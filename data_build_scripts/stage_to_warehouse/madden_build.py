@@ -3,9 +3,10 @@ import os
 import pandas as pd
 import df_fuzzy_merge as fz
 import sys
+
 sys.path.append("..")
 sys.path.append("../../column_matching")
-#import column_matching.column_match as cm
+# import column_matching.column_match as cm
 import data_build_scripts.helpers as hlp
 
 
@@ -37,14 +38,16 @@ def main():
         if counter == 0:
             df = df.append(temp_df)
         else:
-            #df_1 = cm.fuzzy_merge(df, temp_df, ['first_name', 'last_name', 'position_group'],
+            # df_1 = cm.fuzzy_merge(df, temp_df, ['first_name', 'last_name', 'position_group'],
             #            ['first_name', 'last_name', 'position_group'], threshold=95, limit=1)  # inner join
 
-            df = fz.df_fuzzy_merge(df, temp_df, ['first_name', 'last_name', 'position_group'],
-                                   ['first_name', 'last_name', 'position_group'])
-            #df_2 = pd.concat([temp_df, df_1])
-            #df = pd.concat([df, df_2])
-            #df = df.drop_duplicates(subset=['first_name', 'last_name', 'position_group'], keep='last')
+            df_merged = fz.df_fuzzy_merge(df, temp_df, ['first_name', 'last_name', 'position_group'],
+                                   ['first_name', 'last_name', 'position_group'], threshold=90, limit=1)
+
+            df_full = pd.concat([temp_df, df_merged])
+            df = pd.concat([df, df_full])
+            df = df.drop_duplicates(subset=['first_name', 'last_name', 'position_group'], keep='last')
+            print(df)
 
         counter += 1
 
@@ -60,7 +63,6 @@ def main():
 
 
 def add_espn_id():
-
     local_path = os.path.dirname(os.path.abspath(__file__))
     f = open(os.path.join(local_path, "madden_build.json"))
     data = json.load(f)
@@ -75,17 +77,16 @@ def add_espn_id():
     df = pd.read_csv(source)
     espn_id_df = hlp.return_id_df(['first_name', 'last_name', 'position_group', 'espn_id'])
 
-
     df = fz.df_fuzzy_merge(df, espn_id_df, ['first_name', 'last_name', 'position_group'],
-                        ['first_name', 'last_name', 'position_group'], threshold=95, limit=1)
+                           ['first_name', 'last_name', 'position_group'], threshold=95, limit=1, how='left')
+
     df = df[data['id_column_order']]
-
-
 
     target_folder = os.path.join(target_dir, data['output_folder'])
     hlp.make_folder_if_not_exists(target_folder)
     target = os.path.join(target_folder, data['output_file'])
     df.to_csv(target, index=False)
+
 
 def add_fms_id():
     local_path = os.path.dirname(os.path.abspath(__file__))
@@ -100,12 +101,12 @@ def add_fms_id():
     source = os.path.join(source_dir, data['output_folder'], data['output_file'])
 
     df = pd.read_csv(source)
+
     fms = hlp.return_fms_id_df(['first_name', 'last_name', 'position_group', 'fms_id'])
 
-
     df = fz.df_fuzzy_merge(df, fms, ['first_name', 'last_name', 'position_group'],
-                        ['first_name', 'last_name', 'position_group'], threshold=95, limit=1)
-
+                           ['first_name', 'last_name', 'position_group'], threshold=95,
+                           limit=1, how='left')
 
     df = df[data['fms_id_column_order']]
 
@@ -113,5 +114,3 @@ def add_fms_id():
     hlp.make_folder_if_not_exists(target_folder)
     target = os.path.join(target_folder, data['output_file'])
     df.to_csv(target, index=False)
-
-
